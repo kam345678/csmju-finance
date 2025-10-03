@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import SummaryCards from "@/components/SummaryCards";
 import TransactionsTable from "@/components/tutorial/admin/TransactionsTable2";
@@ -19,27 +19,29 @@ export default function TransactionHistoryPage() {
   const addButtonRef = useRef<HTMLButtonElement>(null);
   const [categories, setCategories] = useState<Categories[]>([]);
 
-  async function fetchCategories() {
-  const { data, error } = await supabase.from('Categories').select('*');
-  if (error) return console.error(error.message);
-  setCategories(data ?? []);
-}
+  const fetchCategories = useCallback(async () => {
+    const { data, error } = await supabase.from('Categories').select('*');
+    if (error) return console.error(error.message);
+    setCategories(data ?? []);
+  }, []);
 
-  async function fetchTransactions() {
+  const fetchTransactions = useCallback(async () => {
     setLoading(true);
     let query = supabase
       .from('transactions')
       .select("*, category:Categories(name)")
       .order('date', { ascending: false });
+
     if (filter.date) query = query.eq('date', filter.date);
     if (filter.month) query = query.ilike('date', `${filter.year || ''}-${filter.month.padStart(2,'0')}-%`);
     if (filter.year && !filter.month) query = query.ilike('date', `${filter.year}-%`);
+
     const { data, error } = await query;
     setLoading(false);
     if (error) return console.error(error.message);
     setTransactions(data ?? []);
     setSelectedRows([]);
-  }
+  }, [filter]);
 
   useEffect(() => {
     fetchTransactions();
@@ -57,7 +59,7 @@ export default function TransactionHistoryPage() {
     return () => {
       supabase.removeChannel(channel);
     };
-  } , []);
+  }, [fetchTransactions, fetchCategories]);
 
   function handleFilterChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     setFilter(prev => ({ ...prev, [e.target.name]: e.target.value }));

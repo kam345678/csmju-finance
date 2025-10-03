@@ -91,8 +91,12 @@ const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ onAdded }) => {
       if (onAdded) {
         onAdded();
       }
-    } catch (error: any) {
-      alert(error.message || "An error occurred.");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert("An unknown error occurred.");
+      }
     } finally {
       setLoading(false);
     }
