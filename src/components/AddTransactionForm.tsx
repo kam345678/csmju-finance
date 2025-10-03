@@ -1,94 +1,162 @@
-import { register } from '../types/actions/TransFormAction'
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef } from "react";
+import { register } from "../types/actions/TransFormAction";
 import { supabase } from "../lib/supabase/client";
-import Link from "next/link";
-export default function AddTransactionForm({ onAdded }: { onAdded: () => void }) {
-  const [type, setType] = useState<'income'|'expense'>('expense');
-  const [category, setCategory] = useState<number | null>(null); // เก็บ category_id
+
+interface AddTransactionFormProps {
+  onAdded?: () => void;
+}
+
+const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ onAdded }) => {
+  const formatTime = (date: Date) => {
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+  };
+
+  const [type, setType] = useState<"income" | "expense">("income");
+
   const [categories, setCategories] = useState<{ category_id: number; name: string }[]>([]);
-  const [amount, setAmount] = useState('');
-  const [date, setDate] = useState(new Date().toISOString().slice(0,10));
-  const [note, setNote] = useState('');
+  const [category, setCategory] = useState<number | null>(null);
+  const [amount, setAmount] = useState<string>("");
+  const now = new Date();
+  const [time, setTime] = useState<string>(formatTime(now));
+  const [date, setDate] = useState<string>(now.toISOString().slice(0, 10));
+  const [note, setNote] = useState<string>("");
+  const [attachment, setAttachment] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
 
-  // ดึงหมวดหมู่จาก Supabase
   useEffect(() => {
     async function fetchCategories() {
       const { data, error } = await supabase.from('Categories').select('category_id, name');
-      if (error) return alert('เกิดข้อผิดพลาดในการโหลดหมวดหมู่: ' + error.message);
+      if (error) {
+        alert('เกิดข้อผิดพลาดในการโหลดหมวดหมู่: ' + error.message);
+        return;
+      }
       setCategories(data || []);
+       if (data && data.length > 0) {
+        setCategory(data[0].category_id);
+    }
     }
     fetchCategories();
   }, []);
 
-  async function submit(e: React.FormEvent) {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const a = parseFloat(amount || '0');
-    if (!a) return alert('ใส่จำนวนเงินที่ถูกต้อง');
-    if (!category) return alert('เลือกหมวดหมู่ด้วย');
-    
     setLoading(true);
-    const { error } = await supabase.from('Transactions').insert([{ type, category, amount: a, date, note }]);
-    setLoading(false);
-    if (error) return alert('เกิดข้อผิดพลาด: ' + error.message);
-    
-    // รีเซ็ต form
-    setAmount('');
-    setNote('');
-    setCategory(null);
-    setType('expense');
-    onAdded();
-  }
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        alert("Please log in before submitting.");
+        setLoading(false);
+        return;
+      }
 
-  return (
-    <form onSubmit={submit} action={register} encType="multipart/form-data" className="bg-white/20 p-4 rounded-lg shadow space-y-3">
-      <div className="gap-2">
-        <select value={type} onChange={e => setType(e.target.value as any)} className="border p-2 rounded w-1/3">
-          <option value="income">รายรับ</option>
-          <option value="expense">รายจ่าย</option>
-        </select>
+      // Use current date and time if not provided
+      const inputTime = time && time !== "" ? time : formatTime(new Date());
+      
+      
+      const currentDate = new Date();
+      const inputDate = date ? date : currentDate.toISOString().slice(0, 10);
+      // const inputTime = time ? time : formatTime(new Date());
 
-        {/* Select category */}
-        <select 
-            value={category || ''} 
-            onChange={e => {
-            if (e.target.value === 'add') {
-            // ไปหน้าเพิ่มหมวดหมู่
-            window.location.href = '/admin/category';
-            } else {
-            setCategory(parseInt(e.target.value));
-            }
-        }} 
-          className="border p-2 rounded w-1/3"
-        >
-          <option >เลือกหมวดหมู่</option>
-          {categories.map(c => (
-            <option key={c.category_id} value={c.category_id}>{c.name}</option>
-          ))}
-          
-          <option value="add">เพิ่มหมวดหมู่</option>
-        </select>
-          
-       <input value={note} onChange={e => setNote(e.target.value)} className="border p-2 rounded flex-1" placeholder="บันทึกเพิ่มเติม (ถ้ามี)" />
-      </div>
+      const combinedDateTime = new Date(`${inputDate}T${inputTime}:00`);
+      const isoDateTime = combinedDateTime.toISOString();
+      const formData = new FormData();
+      formData.append("type", type);
+      formData.append("category", category!.toString());
+      // formData.append("category",category.toString());
+      formData.append("amount", amount);
+      formData.append("date", isoDateTime);
+      formData.append("time", inputTime);
+      formData.append("note", note);
+      if (attachment) {
+        formData.append("attachment", attachment);
+      }
+      formData.append("user_id", user.id);
 
-      <div className="flex gap-2">
-        <input value={amount} onChange={e => setAmount(e.target.value)} className="border p-2 rounded w-1/3" placeholder="จำนวนเงิน" />
-        <input type="date" value={date} onChange={e => setDate(e.target.value)} className="border p-2 rounded" />
-      </div>
-        <input
-            className='rounded-md px-4 py-2 bg-inherit border '
-            id="file"
-            type="file"
-            name='attachment'
-            required
-        />
-      <div className="flex justify-end">
-        <button type="submit" className="px-4 py-2 rounded bg-blue-600 text-white" disabled={loading}>
-          {loading ? 'กำลังบันทึก...' : 'เพิ่ม'}
-        </button>
-      </div>
-    </form>
-  );
+      await register(formData);
+
+      setType("income");
+      setCategory(0);
+      setAmount("");
+      setDate("");
+      setTime(formatTime(new Date()));
+      setNote("");
+      setAttachment(null);
+      if (fileInputRef.current) {
+      fileInputRef.current.value = ""; // ล้างไฟล์
 }
 
+      if (onAdded) {
+        onAdded();
+      }
+    } catch (error: any) {
+      alert(error.message || "An error occurred.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <select value={type} onChange={(e) => setType(e.target.value as "income" | "expense")}>
+        <option value="income" >รายรับ</option>
+        <option value="expense" >รายจ่าย</option>
+      </select>
+
+      <select value={category || ''} onChange={(e) => {
+        if (e.target.value === 'add'){
+          window.location.href = '/admin/category'
+          return;
+        } else {
+          setCategory(parseInt(e.target.value));
+        }
+      }}>
+         {categories.map(c => (
+             <option key={c.category_id} value={c.category_id}>{c.name}</option>
+         ))}
+          <option value="add">เพิ่ม</option>
+      </select>
+ 
+      <input
+        type="number"
+        value={amount}
+        placeholder="จำนวนเงิน"
+        onChange={(e) => setAmount(e.target.value)}
+        required
+      />
+
+      <input
+        type="date"
+        value={date}
+        onChange={(e) => setDate(e.target.value)}
+      />
+
+      <input
+        type="time"
+        value={time}
+        onChange={(e) => setTime(e.target.value)}
+      />
+
+      <input
+        placeholder="รายละเอียด"
+        type="text"
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+      />
+      
+      <input
+        ref={fileInputRef}
+        type="file"
+        onChange={(e) => setAttachment(e.target.files ? e.target.files[0] : null)}
+      />
+
+      <button type="submit" disabled={loading}>
+        {loading ? "Submitting..." : "Submit"}
+      </button>
+    </form>
+  );
+};
+
+export default AddTransactionForm;

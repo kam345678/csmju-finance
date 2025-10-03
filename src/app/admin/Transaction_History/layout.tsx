@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase/client";
 import Link from "next/link";
 import Sidebar from "@/components/tutorial/Sidebar";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function TransactionHistoryLayout({ children }: { children: React.ReactNode }) {
   const [email, setEmail] = useState<string | null>(null);
 
   useEffect(() => {

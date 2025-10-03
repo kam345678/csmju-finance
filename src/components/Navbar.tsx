@@ -18,21 +18,27 @@ export default function Navbar() {
 
           {/* Menu */}
           <div className="flex space-x-6">
-            <Link
+            {/* <Link
               href="/"
               className={`${
                 pathname === "/" ? "text-blue-600 font-semibold" : "text-gray-700"
               } hover:text-blue-500`}
             >
               Home
-            </Link>
+            </Link> */}
 
             {/* ปุ่ม Login */}
             <Link
-              href="/auth/login"
+              href="/auth/login/#auth-sign-in"
               className= "text-white px-4 py-2 rounded-lg hover:bg-blue-700/30 transition border border-white"
             >
-              Login
+              sign in
+            </Link>
+            <Link
+              href="/auth/login/#auth-sign-up"
+              className= "text-white px-4 py-2 rounded-lg hover:bg-blue-700/30 transition border border-white"
+            >
+              sign up
             </Link>
           </div>
         </div>

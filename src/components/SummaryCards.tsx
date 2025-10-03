@@ -14,11 +14,11 @@ export default function SummaryCards({ transactions }: { transactions: Transacti
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
       <div className="p-4 rounded-lg shadow bg-white/20">
-        <div className="text-sm">รายรับทั้งหมด</div>
+        <div className="text-sm">รายรับสะสมทั้งหมด</div>
         <div className="text-2xl font-semibold">{formatCurrencyTHB(totalIncome)}</div>
       </div>
       <div className="p-4 rounded-lg shadow bg-white/20">
-        <div className="text-sm">รายจ่ายทั้งหมด</div>
+        <div className="text-sm">รายจ่ายสะสมทั้งหมด</div>
         <div className="text-2xl font-semibold">{formatCurrencyTHB(totalExpense)}</div>
       </div>
       <div className="p-4 rounded-lg shadow bg-white/20">

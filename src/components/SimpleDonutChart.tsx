@@ -1,6 +1,6 @@
 
 "use client"
-import React,{ useState, useEffect } from "react";
+import React from "react";
 import { Transaction } from "../types/index";
 
 function formatCurrencyTHB(n: number) {
@@ -10,7 +10,10 @@ function formatCurrencyTHB(n: number) {
 export default function SimpleDonutChart({ transactions }: { transactions: Transaction[] }) {
   const expenseOnly = transactions.filter(t => t.type === 'expense');
   const totals = expenseOnly.reduce<Record<string, number>>((acc, t) => {
-    acc[t.category] = (acc[t.category] ?? 0) + t.amount;
+    const catName = t.category && typeof t.category === "object"
+    ? t.category.name
+    : String(t.category ?? "-");
+    acc[catName] = (acc[catName] ?? 0) + t.amount;
     return acc;
   }, {});
 
@@ -18,7 +21,7 @@ export default function SimpleDonutChart({ transactions }: { transactions: Trans
   const total = entries.reduce((s, [, v]) => s + v, 0) || 1;
 
   let cumulative = 0;
-  const slices = entries.map(([cat, value], idx) => {
+  const slices = entries.map(([cat, value]) => {
     const start = cumulative / total;
     cumulative += value;
     const end = cumulative / total;

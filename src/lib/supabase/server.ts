@@ -6,12 +6,13 @@ import { cookies } from "next/headers";
  * global variable. Always create a new client within each function when using
  * it.
  */
+
 export async function createClient() {
   const cookieStore = await cookies();
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     
     {
       cookies: {
@@ -33,24 +34,4 @@ export async function createClient() {
     },
   );
 }
-
-
-// import { createServerClient } from "@supabase/ssr";
-
-// export function createClient() {
-//   const dummyCookies = {
-//     get: () => undefined,
-//     getAll: () => [],
-//     set: () => {},
-//     delete: () => {}
-//   };
-
-//   return createServerClient(
-//     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-//     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-//     {
-//       cookies: dummyCookies
-//     }
-//   );
-// }
 
