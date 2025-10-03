@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Auth } from "@supabase/auth-ui-react";
-import { useSearchParams } from 'next/navigation'
+// import { useSearchParams } from 'next/navigation'
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/lib/supabase/client";
 import { useEffect, useState } from "react"; // ✅ เพิ่ม useState
@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 
 export default function AuthPage() {
   const router = useRouter();
-  const searchParams = useSearchParams()
+  // const searchParams = useSearchParams()
   const [view, setView] = useState<'sign_in' | 'sign_up'>('sign_in') // ✅ เพิ่ม useState
 
   useEffect(() => {
