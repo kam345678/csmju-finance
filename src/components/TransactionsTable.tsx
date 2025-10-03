@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client"; // anon key client-side
 import { Transaction } from "@/types/index";
 
+
 // export default function TransactionsClientTable({ onDelete }: { onDelete: (transaction_id: number) => void }) {
 export default function TransactionsClientTable() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -11,14 +12,14 @@ export default function TransactionsClientTable() {
   useEffect(() => {
     async function fetchTransactions() {
       const { data, error } = await supabase
-        .from("transactions")
+        .from('transactions')
         .select("*, category:Categories(name)")
         .order("date", { ascending: false });
 
       if (error) console.error(error);
       else setTransactions(data ?? []);
     }
-
+    // const transactions = data as Transaction[] ?? [];
     fetchTransactions();
   }, []);
 

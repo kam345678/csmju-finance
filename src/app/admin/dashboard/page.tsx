@@ -15,8 +15,10 @@ export default function DashboardPage() {
     setLoading(true);
     // Supabase expects RowType and SelectType to be string or unknown, so pass unknown
     const { data, error } = await supabase
-      .from<Transaction, unknown>('transactions')
+      // .from<Transaction>('transactions')
+      .from('transactions')
       .select("*, category:Categories(name)")
+      
       .order('date', { ascending: false });
     setLoading(false);
     if (error) return console.error('fetch error', error.message);
@@ -37,12 +39,12 @@ export default function DashboardPage() {
     };
   }, [fetchTransactions]);
 
-  async function handleDelete(transaction_id: number) {
-    if (!confirm('ลบรายการนี้?')) return;
-    const { error } = await supabase.from('transactions').delete().eq('transaction_id', transaction_id);
-    if (error) return alert('Delete error: ' + error.message);
-    setTransactions(prev => prev.filter(p => p.transaction_id !== transaction_id));
-  }
+  // async function handleDelete(transaction_id: number) {
+  //   if (!confirm('ลบรายการนี้?')) return;
+  //   const { error } = await supabase.from('transactions').delete().eq('transaction_id', transaction_id);
+  //   if (error) return alert('Delete error: ' + error.message);
+  //   setTransactions(prev => prev.filter(p => p.transaction_id !== transaction_id));
+  // }
 
   return (
     <div className="p-6 min-h-screen">
@@ -62,8 +64,8 @@ export default function DashboardPage() {
             </div>
             {loading ? <div>กำลังโหลด...</div> : (
               <TransactionsTable
-                transactions={transactions}
-                onDelete={handleDelete}
+                // transactions={transactions}
+                // onDelete={handleDelete}
               />
             )}
           </div>
