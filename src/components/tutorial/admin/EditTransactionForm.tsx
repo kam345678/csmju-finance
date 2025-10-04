@@ -62,7 +62,7 @@ const EditTransactionForm: React.FC<EditTransactionFormProps> = ({
     e.preventDefault();
     if (!transaction) return;
 
-    
+
 
     setLoading(true);
     try {
@@ -99,105 +99,157 @@ const EditTransactionForm: React.FC<EditTransactionFormProps> = ({
       } else if (onClose) {
         onClose();
       }
-        } catch (error: unknown) {
+    } catch (error: unknown) {
       if (error instanceof Error) {
         alert(error.message);
       } else {
         alert("An unknown error occurred.");
       }
-      }finally {
-        setLoading(false);
-      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!show || !transaction) return null;
 
   return (
-    <div className="fixed inset-0 bg-opacity-30 z-40 flex items-center justify-center">
-      <div className="bg-gray-800 p-6 rounded shadow-lg min-w-[340px] relative">
-        <div className="flex justify-between items-center mb-4">
-          <button
-            className="absolute right-2 top-2 bg-red-600 border rounded text-gray-400 hover:text-gray-600"
-            onClick={onClose}
-          >
-            x 
-          </button>
-        </div>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 flex items-center justify-center p-4">
+      {/* กล่อง Modal */}
+      <div className="bg-slate-900 text-white p-6 rounded-xl shadow-2xl w-full max-w-md border border-slate-700 relative animate-fadeIn">
+        {/* ปุ่มปิด */}
+        <button
+          onClick={onClose}
+          className="absolute right-3 top-3 text-gray-400 hover:text-red-400 transition"
+        >
+          ✕
+        </button>
+
+        <h2 className="text-lg font-semibold mb-4 text-emerald-400">
+           แก้ไขข้อมูล
+        </h2>
+
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <select value={type} onChange={(e) => setType(e.target.value as "income" | "expense")}>
-            <option value="income">รายรับ</option>
-            <option value="expense">รายจ่าย</option>
-          </select>
-
-          <select
-            value={category || ""}
-            onChange={(e) => {
-              if (e.target.value === "add") {
-                window.location.href = "/admin/category";
-              } else {
-                const val = parseInt(e.target.value);
-                if (!isNaN(val)) {
-                  setCategory(val);
-                }
+          {/* ประเภท */}
+          <div>
+            <label className="block text-sm text-gray-300 mb-1">ประเภท</label>
+            <select
+              value={type}
+              onChange={(e) =>
+                setType(e.target.value as "income" | "expense")
               }
-            }}
-          >
-            {categories.map((c) => (
-              <option key={c.category_id} value={c.category_id}>
-                {c.name}
-              </option>
-            ))}
-            <option value="add">เพิ่ม</option>
-          </select>
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+            >
+              <option value="income">รายรับ</option>
+              <option value="expense">รายจ่าย</option>
+            </select>
+          </div>
 
-          <input
-            type="number"
-            value={amount}
-            placeholder="จำนวนเงิน"
-            onChange={(e) => setAmount(e.target.value)}
-            required
-          />
+          {/* หมวดหมู่ */}
+          <div>
+            <label className="block text-sm text-gray-300 mb-1">หมวดหมู่</label>
+            <select
+              value={category || ""}
+              onChange={(e) => {
+                if (e.target.value === "add") {
+                  window.location.href = "/admin/category";
+                } else {
+                  const val = parseInt(e.target.value);
+                  if (!isNaN(val)) setCategory(val);
+                }
+              }}
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+            >
+              {categories.map((c) => (
+                <option key={c.category_id} value={c.category_id}>
+                  {c.name}
+                </option>
+              ))}
+              <option value="add">➕ เพิ่มหมวดหมู่ใหม่</option>
+            </select>
+          </div>
 
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+          {/* จำนวนเงิน */}
+          <div>
+            <label className="block text-sm text-gray-300 mb-1">จำนวนเงิน</label>
+            <input
+              type="number"
+              value={amount}
+              placeholder="จำนวนเงิน (บาท)"
+              onChange={(e) => setAmount(e.target.value)}
+              required
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+            />
+          </div>
 
-          <input type="time" value={time} onChange={(e) => setTime(e.target.value)} />
+          {/* วันที่ + เวลา */}
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <label className="block text-sm text-gray-300 mb-1">วันที่</label>
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+              />
+            </div>
+            <div className="flex-1">
+              <label className="block text-sm text-gray-300 mb-1">เวลา</label>
+              <input
+                type="time"
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+              />
+            </div>
+          </div>
 
-          <input
-            placeholder="รายละเอียด"
-            type="text"
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-          />
+          {/* รายละเอียด */}
+          <div>
+            <label className="block text-sm text-gray-300 mb-1">รายละเอียด</label>
+            <input
+              type="text"
+              placeholder="รายละเอียดเพิ่มเติม"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+            />
+          </div>
 
-          <input
-            ref={fileInputRef}
-            type="file"
-            onChange={(e) => setAttachment(e.target.files ? e.target.files[0] : null)}
-            className="file:mr-4 file:rounded-full file:border-0 file:bg-violet-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-violet-700 hover:file:bg-violet-100 dark:file:bg-violet-600 dark:file:text-violet-100 dark:hover:file:bg-violet-500"
-          />
+          {/* แนบไฟล์ */}
+          <div>
+            <label className="block text-sm text-gray-300 mb-1">แนบไฟล์</label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              onChange={(e) =>
+                setAttachment(e.target.files ? e.target.files[0] : null)
+              }
+              className="w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-emerald-600 file:px-3 file:py-2 file:text-white hover:file:bg-emerald-500 cursor-pointer"
+            />
+          </div>
 
-          <div className="flex justify-end items-center">
+          {/* ปุ่ม */}
+          <div className="flex justify-end items-center gap-2 mt-4">
             <button
               type="button"
-              className="mr-2 px-4 py-2 rounded bg-red-500 hover:bg-gray-400"
-              onClick={() => {
-                onClose();
-              }}
+              className="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-gray-200 transition"
+              onClick={onClose}
             >
-              Cancel
+              ❌ ยกเลิก
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+              className="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition"
             >
-              {loading ? "Updating..." : "Update"}
+              {loading ? "กำลังอัปเดต..." : "บันทึกการเปลี่ยนแปลง"}
             </button>
           </div>
         </form>
       </div>
     </div>
   );
+
 };
 
 export default EditTransactionForm;

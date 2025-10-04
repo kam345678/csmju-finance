@@ -19,22 +19,29 @@ export default function TransactionHistoryPage() {
   const addButtonRef = useRef<HTMLButtonElement>(null);
   const [categories, setCategories] = useState<Categories[]>([]);
 
+
   const fetchCategories = useCallback(async () => {
-    const { data, error } = await supabase.from('Categories').select('*');
+    const { data, error } = await supabase.from("Categories").select("*");
     if (error) return console.error(error.message);
     setCategories(data ?? []);
   }, []);
 
+
   const fetchTransactions = useCallback(async () => {
     setLoading(true);
     let query = supabase
-      .from('transactions')
+      .from("transactions")
       .select("*, category:Categories(name)")
-      .order('date', { ascending: false });
+      .order("date", { ascending: false });
 
-    if (filter.date) query = query.eq('date', filter.date);
-    if (filter.month) query = query.ilike('date', `${filter.year || ''}-${filter.month.padStart(2,'0')}-%`);
-    if (filter.year && !filter.month) query = query.ilike('date', `${filter.year}-%`);
+    if (filter.date) query = query.eq("date", filter.date);
+    if (filter.month)
+      query = query.ilike(
+        "date",
+        `${filter.year || ""}-${filter.month.padStart(2, "0")}-%`
+      );
+    if (filter.year && !filter.month)
+      query = query.ilike("date", `${filter.year}-%`);
 
     const { data, error } = await query;
     setLoading(false);
@@ -46,9 +53,14 @@ export default function TransactionHistoryPage() {
   useEffect(() => {
     fetchTransactions();
     fetchCategories();
+
     const channel = supabase
-      .channel('public:transactions')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, () => fetchTransactions());
+      .channel("public:transactions")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "transactions" },
+        () => fetchTransactions()
+      );
 
     channel.subscribe((status) => {
       if (status === "SUBSCRIBED") {
@@ -61,81 +73,127 @@ export default function TransactionHistoryPage() {
     };
   }, [fetchTransactions, fetchCategories]);
 
-  function handleFilterChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
-    setFilter(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  // ✅ ฟังก์ชันกรองข้อมูล
+  function handleFilterChange(
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) {
+    setFilter((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
+
   async function handleDelete(id: number) {
-    if (!confirm('ลบรายการนี้?')) return;
-    const { error } = await supabase.from('transactions').delete().eq('transaction_id', id);
+    if (!confirm("ลบรายการนี้?")) return;
+    const { error } = await supabase
+      .from("transactions")
+      .delete()
+      .eq("transaction_id", id);
     if (error) return alert(error.message);
-    setTransactions(prev => prev.filter(t => t.transaction_id !== id));
-    setSelectedRows(prev => prev.filter(row => row !== id));
+    setTransactions((prev) => prev.filter((t) => t.transaction_id !== id));
+    setSelectedRows((prev) => prev.filter((row) => row !== id));
   }
+
 
   function handleEdit(transaction: Transaction) {
     setEditTransaction(transaction);
     setShowEditForm(true);
   }
 
+
   async function handleDeleteSelected() {
     if (selectedRows.length === 0) return;
     if (!confirm(`ลบ ${selectedRows.length} รายการที่เลือก?`)) return;
-    const { error } = await supabase.from('transactions').delete().in('transaction_id', selectedRows);
+    const { error } = await supabase
+      .from("transactions")
+      .delete()
+      .in("transaction_id", selectedRows);
     if (error) return alert(error.message);
-    setTransactions(prev => prev.filter(t => !selectedRows.includes(t.transaction_id)));
+    setTransactions((prev) =>
+      prev.filter((t) => !selectedRows.includes(t.transaction_id))
+    );
     setSelectedRows([]);
   }
 
   return (
     <>
-      <SummaryCards transactions={transactions} />
-      <div className="p-6 relative">
-        <h1 className="text-xl font-bold mb-4">ประวัติการทำรายการ</h1>
+      {/* ✅ Summary */}
+      <div className="bg-slate-900 text-white p-4 sm:p-6 min-h-screen">
+        <SummaryCards transactions={transactions} />
 
-        <FilterSection
-          filter={filter}
-          onFilterChange={handleFilterChange}
-          transactions={transactions}
-        />
+        {/* ✅ Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mt-6 mb-4">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-wide">
+             ประวัติการทำรายการ
+          </h1>
 
-        <TransactionsTable
-          transactions={transactions}
-          loading={loading}
-          selectedRows={selectedRows}
-          setSelectedRows={setSelectedRows}
-          handleDelete={handleDelete}
-          handleDeleteSelected={handleDeleteSelected}
-          handleEdit={handleEdit}
-          categories={categories} // ต้องมีตัวแปร categories
-        />
+          <div className="flex gap-2">
+            <button
+              onClick={() => fetchTransactions()}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white text-sm sm:text-base font-medium shadow-md transition-all"
+            >
+              🔄 รีเฟรช
+            </button>
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg text-white text-sm sm:text-base font-medium shadow-md transition-all"
+            >
+              ➕ เพิ่มรายการ
+            </button>
+          </div>
+        </div>
 
+        {/* ✅ Filter Section */}
+        <div className="bg-slate-800/80 p-4 rounded-xl border border-slate-700 shadow-md mb-6">
+          <FilterSection
+            filter={filter}
+            onFilterChange={handleFilterChange}
+            transactions={transactions}
+          />
+        </div>
+
+        {/* ✅ Transactions Table */}
+        <div className="bg-slate-800/90 rounded-xl border border-slate-700 shadow-lg overflow-x-auto">
+          <TransactionsTable
+            transactions={transactions}
+            loading={loading}
+            selectedRows={selectedRows}
+            setSelectedRows={setSelectedRows}
+            handleDelete={handleDelete}
+            handleDeleteSelected={handleDeleteSelected}
+            handleEdit={handleEdit}
+            categories={categories}
+          />
+        </div>
+
+        {/* ✅ Floating Add Button (มือถือ) */}
         <button
           ref={addButtonRef}
-          className="fixed bottom-8 right-8 z-50 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg p-4 text-2xl"
+          className="fixed bottom-8 right-8 z-50 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg p-4 text-3xl sm:hidden"
           title="เพิ่มรายการ"
           onClick={() => setShowAddForm(true)}
-        >+</button>
+        >
+          +
+        </button>
 
+        {/* ✅ Modal Add/Edit */}
         <AddTransactionForm2
           show={showAddForm}
           onClose={() => setShowAddForm(false)}
-          onAdded={() => { setShowAddForm(false); fetchTransactions(); }}
-          onCancel={() => setShowEditForm(false)} 
+          onAdded={() => {
+            setShowAddForm(false);
+            fetchTransactions();
+          }}
+          onCancel={() => setShowAddForm(false)}
         />
 
-        {/* <EditTransactionForm
-          show={showEditForm}
-          transaction={editTransaction}
-          onClose={() => { setShowEditForm(false); setEditTransaction(null); }}
-          onUpdated={() => { setShowEditForm(false); setEditTransaction(null); fetchTransactions(); }}
-        /> */}
         <EditTransactionForm
           show={showEditForm}
           transaction={editTransaction}
-          onUpdated={() => { setShowEditForm(false); fetchTransactions(); }}
+          onUpdated={() => {
+            setShowEditForm(false);
+            fetchTransactions();
+          }}
           onClose={() => setShowEditForm(false)}
-          onCancel={() => setShowEditForm(false)}   // ✅ ส่งมา
+          onCancel={() => setShowEditForm(false)}
         />
       </div>
     </>

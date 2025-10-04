@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect, useState, useCallback } from "react";
 import { supabase } from "../../../lib/supabase/client";
 import { Transaction } from "../../../types/index";
@@ -13,25 +13,24 @@ export default function DashboardPage() {
 
   const fetchTransactions = useCallback(async () => {
     setLoading(true);
-    // Supabase expects RowType and SelectType to be string or unknown, so pass unknown
     const { data, error } = await supabase
-      // .from<Transaction>('transactions')
-      .from('transactions')
+      .from("transactions")
       .select("*, category:Categories(name)")
-      
-      .order('date', { ascending: false });
+      .order("date", { ascending: false });
     setLoading(false);
-    if (error) return console.error('fetch error', error.message);
-    setTransactions(data as Transaction[] ?? []);
+    if (error) return console.error("fetch error", error.message);
+    setTransactions((data as Transaction[]) ?? []);
   }, []);
 
   useEffect(() => {
     fetchTransactions();
     const sub = supabase
-      .channel('public:transactions')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, () => {
-        fetchTransactions();
-      })
+      .channel("public:transactions")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "transactions" },
+        () => fetchTransactions()
+      )
       .subscribe();
 
     return () => {
@@ -39,45 +38,67 @@ export default function DashboardPage() {
     };
   }, [fetchTransactions]);
 
-  // async function handleDelete(transaction_id: number) {
-  //   if (!confirm('ลบรายการนี้?')) return;
-  //   const { error } = await supabase.from('transactions').delete().eq('transaction_id', transaction_id);
-  //   if (error) return alert('Delete error: ' + error.message);
-  //   setTransactions(prev => prev.filter(p => p.transaction_id !== transaction_id));
-  // }
-
   return (
-    <div className="p-6 min-h-screen">
-      <div className="max-w-5xl mx-auto">
-        <header className="mb-6 flex items-center justify-between">
-          <h1 className="text-3xl font-bold">ระบบบัญชีรายรับรายจ่าย</h1>
-          <nav className="text-sm text-gray-600">แดชบอร์ด • รายการ • โปรไฟล์</nav>
+    <div className="min-h-screen bg-slate-900 text-white p-4 sm:p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
+        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-700">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-wide text-white">
+               ระบบบัญชีรายรับรายจ่าย
+            </h1>
+            <p className="text-slate-400 text-sm mt-1">
+              จัดการข้อมูลทางการเงินของคุณได้อย่างง่ายและปลอดภัย
+            </p>
+          </div>
         </header>
 
-        <SummaryCards transactions={transactions} />
+        {/* Summary Cards */}
+        <div className="bg-slate-800/80 p-5 rounded-2xl border border-slate-700 shadow-lg">
+          <SummaryCards transactions={transactions} />
+        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          <div className="col-span-2">
-            <div className="mb-4 flex justify-between items-center">
-              <h2 className="text-xl font-semibold">รายการล่าสุด</h2>
-              <div className="text-sm text-gray-500">{transactions.length} รายการ</div>
+        {/* Main content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left section */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Transactions */}
+            <div className="bg-slate-800/90 rounded-xl border border-slate-700 shadow-lg p-4">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold text-white">
+                  รายการล่าสุด
+                </h2>
+                <div className="text-slate-400 text-sm">
+                  {transactions.length} รายการ
+                </div>
+              </div>
+              {loading ? (
+                <div className="text-slate-400 text-center py-6 animate-pulse">
+                  กำลังโหลดข้อมูล...
+                </div>
+              ) : (
+                <TransactionsTable transactions={transactions} />
+              )}
             </div>
-            {loading ? <div>กำลังโหลด...</div> : (
-              <TransactionsTable
-                // transactions={transactions}
-                // onDelete={handleDelete}
-              />
-            )}
           </div>
 
-          <aside>
-            <h3 className="text-lg font-medium mb-3">สัดส่วนรายจ่าย</h3>
-            <div className="p-4 bg-white/20 rounded-lg shadow">
-              <SimpleDonutChart transactions={transactions} />
+          {/* Right section */}
+          <aside className="space-y-6">
+            {/* Donut chart */}
+            <div className="bg-slate-800/90 p-4 rounded-xl border border-slate-700 shadow-lg flex flex-col items-center">
+              <h3 className="text-lg font-medium mb-3 text-white">
+                สัดส่วนรายจ่าย
+              </h3>
+              <div className="flex justify-center items-center w-full min-h-[280px]">
+                <SimpleDonutChart transactions={transactions} />
+              </div>
             </div>
 
-            <div className="mt-6">
-              <h3 className="text-lg font-medium mb-3">เพิ่มรายการ</h3>
+            {/* Add form */}
+            <div className="bg-slate-800/90 p-4 rounded-xl border border-slate-700 shadow-lg">
+              <h3 className="text-lg font-medium mb-3 text-white">
+                เพิ่มรายการใหม่
+              </h3>
               <AddTransactionForm onAdded={fetchTransactions} />
             </div>
           </aside>

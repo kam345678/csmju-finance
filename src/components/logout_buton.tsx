@@ -1,6 +1,7 @@
 "use client";
 import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { LogOut } from "lucide-react";
 
 export function LogoutButton() {
   const router = useRouter();
@@ -11,11 +12,15 @@ export function LogoutButton() {
   };
 
   return (
-      <button
-        onClick={handleLogout}
-        className="border border-gray-300/60 px-4 py-2 bg-red-600/60 text-white rounded-lg  hover:bg-red-600/80 "
-      >
-        sign out
-      </button>
+    <button
+      onClick={handleLogout}
+      className="flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-600 
+                 bg-gradient-to-r from-red-600/70 to-red-500/60 text-white font-medium 
+                 hover:from-red-600 hover:to-red-500 hover:shadow-lg hover:shadow-red-900/40 
+                 transition-all duration-200 ease-in-out"
+    >
+      <LogOut size={18} className="opacity-90" />
+      ออกจากระบบ
+    </button>
   );
 }
