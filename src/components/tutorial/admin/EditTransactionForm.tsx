@@ -81,7 +81,8 @@ const EditTransactionForm: React.FC<EditTransactionFormProps> = ({
       const formData = new FormData();
       formData.append("transaction_id", transaction.transaction_id.toString()); // ส่ง id ไปด้วย
       formData.append("type", type);
-      formData.append("category", category!.toString());
+      const validCategory = typeof category === "number" && !isNaN(category) ? category : transaction.category;
+      formData.append("category", validCategory.toString());
       formData.append("amount", amount);
       formData.append("date", isoDateTime);
       formData.append("time", inputTime);
@@ -110,16 +111,7 @@ const EditTransactionForm: React.FC<EditTransactionFormProps> = ({
   };
 
   if (!show || !transaction) return null;
-  <button
-  type="button"
-  className="mr-2 px-4 py-2 rounded bg-red-500 hover:bg-gray-400"
-  onClick={() => {
-    
-    onClose();
-  }}
->
-  Cancel
-</button>
+
   return (
     <div className="fixed inset-0 bg-opacity-30 z-40 flex items-center justify-center">
       <div className="bg-gray-800 p-6 rounded shadow-lg min-w-[340px] relative">
@@ -143,7 +135,10 @@ const EditTransactionForm: React.FC<EditTransactionFormProps> = ({
               if (e.target.value === "add") {
                 window.location.href = "/admin/category";
               } else {
-                setCategory(parseInt(e.target.value));
+                const val = parseInt(e.target.value);
+                if (!isNaN(val)) {
+                  setCategory(val);
+                }
               }
             }}
           >
@@ -178,6 +173,7 @@ const EditTransactionForm: React.FC<EditTransactionFormProps> = ({
             ref={fileInputRef}
             type="file"
             onChange={(e) => setAttachment(e.target.files ? e.target.files[0] : null)}
+            className="file:mr-4 file:rounded-full file:border-0 file:bg-violet-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-violet-700 hover:file:bg-violet-100 dark:file:bg-violet-600 dark:file:text-violet-100 dark:hover:file:bg-violet-500"
           />
 
           <div className="flex justify-end items-center">

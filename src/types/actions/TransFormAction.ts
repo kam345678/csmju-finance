@@ -10,7 +10,11 @@ export async function register(formData: FormData): Promise<void> {
   const transaction_id = formData.get("transaction_id") as string | null;
   const user_id = formData.get("user_id") as string;
   const type = formData.get("type") as "income" | "expense";
-  const category = parseInt(formData.get("category") as string);
+  const categoryStr = formData.get("category") as string | null;
+  if (!categoryStr || isNaN(Number(categoryStr))) {
+    throw new Error("Category must be a valid number");
+  }
+  const category = parseInt(categoryStr);
   const amount = parseFloat(formData.get("amount") as string);
   const date = formData.get("date") as string;
   const time = formData.get("time") as string;

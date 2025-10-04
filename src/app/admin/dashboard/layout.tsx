@@ -7,6 +7,8 @@ import Link from "next/link";
 import Sidebar from "@/components/tutorial/Sidebar";
 import { Menu } from "lucide-react";
 import Image from "next/image";
+
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [email, setEmail] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -19,7 +21,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, []);
 
   return (
-    <div className="flex h-screen bg-gray-900 text-white">
+    <div className="flex h-screen bg-slate-900 text-white">
     
       {isSidebarOpen && (
         <div
