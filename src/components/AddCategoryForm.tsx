@@ -53,7 +53,7 @@ export default function AddCategoryForm({ onAdded }: { onAdded: () => void }) {
     }
   }
 
-  return (
+  return ( //saiko
     <form onSubmit={submit} className="bg-white/20 p-4 rounded-lg shadow space-y-3">
       <div>
         <input

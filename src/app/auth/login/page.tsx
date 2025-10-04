@@ -27,7 +27,7 @@ export default function AuthPage() {
         //  เมื่อ Login สำเร็จ → redirect ได้เลย
         const email = session.user.email;
 
-        if (email === "tk.kam23132@gmail.com") {
+        if (email === "tk.kam23132@gmail.com"|| email === "khumpeechaiaranon@gmail.com") {
           router.push("/admin/dashboard");
         } else if (email === "b@example.com") {
           router.push("/pageB");
