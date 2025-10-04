@@ -3,6 +3,7 @@ import { register } from "../../../types/actions/TransFormAction";
 import { supabase } from "../../../lib/supabase/client";
 
 
+
 interface AddTransactionFormProps {
   onAdded?: () => void;
   onClose: () => void;
@@ -19,15 +20,14 @@ const AddTransactionForm2: React.FC<AddTransactionFormProps> = ({  show, onClose
   };
  
   const [type, setType] = useState<"income" | "expense">("income");
-  // const [category, setCategory] = useState<number>(1);
+
   const [categories, setCategories] = useState<{ category_id: number; name: string }[]>([]);
   const [category, setCategory] = useState<number | null>(null);
   const [amount, setAmount] = useState<string>("");
   const now = new Date();
   const [time, setTime] = useState<string>(formatTime(now));
   const [date, setDate] = useState<string>(now.toISOString().slice(0, 10));
-  // const [date, setDate] = useState<string>("");
-  // const [time, setTime] = useState<string>(() => formatTime(new Date()));
+
   const [note, setNote] = useState<string>("");
   const [attachment, setAttachment] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -72,7 +72,7 @@ const AddTransactionForm2: React.FC<AddTransactionFormProps> = ({  show, onClose
       const formData = new FormData();
       formData.append("type", type);
       formData.append("category", category!.toString());
-      // formData.append("category",category.toString());
+    
       formData.append("amount", amount);
       formData.append("date", isoDateTime);
       formData.append("time", inputTime);
@@ -169,6 +169,7 @@ const AddTransactionForm2: React.FC<AddTransactionFormProps> = ({  show, onClose
             ref={fileInputRef}
             type="file"
             onChange={(e) => setAttachment(e.target.files ? e.target.files[0] : null)}
+            className="file:mr-4 file:rounded-full file:border-0 file:bg-violet-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-violet-700 hover:file:bg-violet-100 dark:file:bg-violet-600 dark:file:text-violet-100 dark:hover:file:bg-violet-500"
           />
           <div className="flex justify-end items-center">
             <button

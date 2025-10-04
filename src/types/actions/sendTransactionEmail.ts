@@ -3,8 +3,6 @@ import { v4 as uuidv4 } from "uuid";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import nodemailer from "nodemailer";
-import { createClient } from "@supabase/supabase-js";
-
 
 export async function register(formData: FormData): Promise<void> {
   const transaction_id = formData.get("transaction_id") as string | null;
@@ -16,32 +14,11 @@ export async function register(formData: FormData): Promise<void> {
   const time = formData.get("time") as string;
   const note = formData.get("note") as string;
   const file = formData.get("attachment") as File | null;
-  const supabase = createServerComponentClient({
-    cookies: () => Promise.resolve(cookies())
-  });
+  const supabase = createServerComponentClient({ cookies });
   let attachment_URL = "";
-
-  const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY! 
-  );
-
+  
   if (!user_id) {
     throw new Error("ไม่พบ user ต้องล็อกอินก่อน");
-  }
-
-  // Check if category exists in Categories table
-  const { data: categoryData, error: categoryError } = await supabase
-    .from("Categories")
-    .select("category_id")
-    .eq("category_id", category)
-    .maybeSingle();
-
-  if (categoryError) {
-    throw new Error(`Error checking category: ${categoryError.message}`);
-  }
-  if (!categoryData) {
-    throw new Error(`Category with id ${category} does not exist`);
   }
 
   let insertedTransactionId = transaction_id;
@@ -56,46 +33,17 @@ export async function register(formData: FormData): Promise<void> {
     if (error) throw new Error(error.message);
     console.log("Update successful! ID:", transaction_id);
   } else {
-    // Upload file first if exists
-    let attachment_URL = "";
-    if (file && file.size > 0) {
-      if (file.size > 20 * 1024 * 1024) throw new Error("File too large, max 20 MB");
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${uuidv4()}.${fileExt}`;
-      const { error: uploadError } = await supabase.storage.from("attachments").upload(fileName, file);
-      if (uploadError) throw new Error(uploadError.message);
-      const { data: urlData } = supabase.storage.from("attachments").getPublicUrl(fileName);
-      attachment_URL = urlData.publicUrl;
-    }
-
-    // Prepare transaction data
-    const transactionInsertData: {
-      user_id: string;
-      type: "income" | "expense";
-      category: number;
-      amount: number;
-      date: string;
-      time: string;
-      note: string;
-      attachment_URL?: string;
-    } = { user_id, type, category, amount, date, time, note };
-    if (attachment_URL) {
-      const { data: existing } = await supabase
-        .from("transactions")
-        .select("transaction_id")
-        .eq("attachment_URL", attachment_URL)
-        .maybeSingle();
-      if (!existing) transactionInsertData.attachment_URL = attachment_URL;
-    }
-
-    const { data, error } = await supabase.from("transactions").insert([transactionInsertData]).select();
+    //  Insert
+    const { data, error } = await supabase.from("transactions").insert([
+      { user_id, type, category, amount, date, time, note },
+    ]).select();
     if (error) throw new Error(error.message);
     insertedTransactionId = data![0].transaction_id;
     console.log("Insert successful! ID:", insertedTransactionId);
   }
 
   // Upload file ถ้ามี
-  if (file && file.size > 0 && transaction_id) {
+  if (file && file.size > 0) {
     if (file.size > 20 * 1024 * 1024) { // 20 MB
       throw new Error("File too large, max 20 MB");
     }
@@ -120,31 +68,19 @@ export async function register(formData: FormData): Promise<void> {
 
     attachment_URL = urlData.publicUrl;
 
-    // ตรวจสอบก่อนว่า URL นี้ถูกใช้ในตารางหรือยัง
-    const { data: existingFile } = await supabase
+    // Update row ด้วย attachment_URL
+    const { error: updateRowError } = await supabase
       .from("transactions")
-      .select("transaction_id")
-      .eq("attachment_URL", attachment_URL)
-      .maybeSingle();
+      .update({ attachment_URL })
+      .eq("transaction_id", insertedTransactionId);
 
-    // ถ้ายังไม่ถูกใช้ หรือเป็น transaction เดียวกัน ค่อยอัปเดต
-    if (!existingFile || existingFile.transaction_id === insertedTransactionId) {
-      const { error: updateRowError } = await supabase
-        .from("transactions")
-        .update({ attachment_URL })
-        .eq("transaction_id", insertedTransactionId);
-
-      if (updateRowError) {
-        console.error("Update attachment URL error:", updateRowError);
-        throw new Error(updateRowError.message);
-      }
-    } else {
-      console.warn("Attachment URL already used, skipping update:", attachment_URL);
+    if (updateRowError) {
+      console.error("Update attachment URL error:", updateRowError);
+      throw new Error(updateRowError.message);
     }
-
   }
 
-  // Fetch transaction details for email content (after attachment_URL update)
+  // Fetch transaction details for email content
   const { data: transactionData, error: transactionError } = await supabase
     .from("transactions")
     .select("*")
@@ -155,20 +91,16 @@ export async function register(formData: FormData): Promise<void> {
     console.error("Error fetching transaction for email:", transactionError);
     throw new Error(transactionError.message);
   }
-  const {error: testError } = await supabaseAdmin.auth.admin.listUsers();
-    if (testError) {
-      console.error("Admin test error:", testError.message);
-      throw new Error("Service key invalid or unauthorized");
-    }
+
   // Fetch user who performed the action
-  const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(user_id);
+  const { data: userData, error: userError } = await supabase.auth.admin.getUserById(user_id);
   if (userError) {
     console.error("Error fetching user info for email:", userError);
     throw new Error(userError.message);
   }
 
   // Fetch all users to send email
-  const { data: allUsers, error: allUsersError } = await supabaseAdmin.auth.admin.listUsers();
+  const { data: allUsers, error: allUsersError } = await supabase.auth.admin.listUsers();
   if (allUsersError) {
     console.error("Error fetching all users for email:", allUsersError);
     throw new Error(allUsersError.message);
@@ -197,7 +129,7 @@ export async function register(formData: FormData): Promise<void> {
       <li>Date: ${transactionData.date}</li>
       <li>Time: ${transactionData.time}</li>
       <li>Note: ${transactionData.note}</li>
-      <li>Attachment URL: ${attachment_URL ? attachment_URL : "None"}</li>
+      <li>Attachment URL: ${attachment_URL || "None"}</li>
     </ul>
   `;
 
@@ -219,3 +151,4 @@ export async function register(formData: FormData): Promise<void> {
 
   console.log("Register + upload successful! File URL:", attachment_URL);
 }
+

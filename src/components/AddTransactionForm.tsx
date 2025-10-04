@@ -154,6 +154,7 @@ const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ onAdded }) => {
         ref={fileInputRef}
         type="file"
         onChange={(e) => setAttachment(e.target.files ? e.target.files[0] : null)}
+        className="file:mr-4 file:rounded-full file:border-0 file:bg-violet-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-violet-700 hover:file:bg-violet-100 dark:file:bg-violet-600 dark:file:text-violet-100 dark:hover:file:bg-violet-500"
       />
 
       <button type="submit" disabled={loading}>

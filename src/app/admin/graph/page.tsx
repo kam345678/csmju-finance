@@ -10,6 +10,7 @@ import IncomeExpenseBar from "@/components/charts/IncomeExpenseBar";
 import ExpenseByCategoryBar from "@/components/charts/ExpenseByCategoryBar";
 import LineByCategoryChart from "@/components/charts/LineByCategoryChart";
 import SummaryCards from "@/components/SummaryCards";
+import IncomeCategoryDonut from "@/components/charts/IncomeCategoryDonut";
 
 export default function GraphPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -58,6 +59,7 @@ export default function GraphPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <ExpenseIncomeDonut transactions={transactions} />
             <ExpenseCategoryDonut transactions={transactions} />
+            <IncomeCategoryDonut transactions={transactions} />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <IncomeExpenseBar transactions={transactions} />
