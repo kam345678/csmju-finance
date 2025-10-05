@@ -3,11 +3,11 @@ import { LogoutButton } from "@/components/logout_buton";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import Link from "next/link";
-import Sidebar from "@/components/tutorial/Sidebar";
+import Sidebar from "@/components/tutorial/user/Sidebar";
 import { Menu } from "lucide-react";
 import Image from "next/image";
 
-export default function TransactionLayout({ children }: { children: React.ReactNode }) {
+export default function TransavtionLayout({ children }: { children: React.ReactNode }) {
   const [email, setEmail] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
