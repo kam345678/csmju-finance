@@ -19,13 +19,12 @@ export default function FilterSection({
     new Set(transactions.map((t) => t.date?.split("-")[0]).filter(Boolean))
   );
 
-  // ✅ รีเซ็ตทั้งหมดในครั้งเดียว
   const handleReset = () => {
-    const resetEvent = {
-      target: { name: "reset", value: "" },
-    } as unknown as React.ChangeEvent<HTMLInputElement>;
-    onFilterChange(resetEvent);
-  };
+  // ส่ง filter ใหม่ที่ว่างทั้งหมดกลับไป
+  onFilterChange({
+    target: { name: "resetAll", value: "" },
+  } as unknown as React.ChangeEvent<HTMLInputElement>);
+};
 
   return (
     <div className="flex flex-wrap items-end gap-3 mb-6 bg-slate-900/80 border border-slate-700 rounded-xl p-4 shadow-md">

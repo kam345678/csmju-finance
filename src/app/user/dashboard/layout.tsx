@@ -3,11 +3,11 @@ import { LogoutButton } from "@/components/logout_buton";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import Link from "next/link";
-import Sidebar from "@/components/tutorial/Sidebar";
+import Sidebar from "@/components/tutorial/user/Sidebar";
 import { Menu } from "lucide-react";
 import Image from "next/image";
 
-export default function TransactionLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [email, setEmail] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -73,7 +73,7 @@ export default function TransactionLayout({ children }: { children: React.ReactN
             bg-gradient-to-b from-[#0B1F2D] via-[#123445] to-[#1B3A4B] 
             border-r border-[#123445]/40 p-4 transform transition-transform duration-300 ease-in-out z-50
             ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 
-            shadow-xl`}
+             shadow-xl`}
           >
             <Sidebar />
           </div>

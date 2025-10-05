@@ -31,8 +31,6 @@ export default function AuthPage() {
           email === "khumpeechaiaranon@gmail.com"
         ) {
           router.push("/admin/dashboard");
-        } else if (email === "b@example.com") {
-          router.push("/pageB");
         } else {
           router.push("/user/dashboard");
         }
