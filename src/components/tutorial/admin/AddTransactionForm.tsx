@@ -110,84 +110,142 @@ const AddTransactionForm2: React.FC<AddTransactionFormProps> = ({  show, onClose
   };
   if (!show) return null;
   return (
-    <div className="fixed inset-0  bg-opacity-30 z-40 flex items-center justify-center">
-      <div className="bg-gray-800 p-6 rounded shadow-lg min-w-[340px] relative">
-        <div className="flex justify-between items-center mb-4">
-          <button
-            className="absolute right-2 top-2 bg-red-600 border rounded text-gray-400 hover:text-gray-600"
-            onClick={onClose}
-          >close</button>
-        </div>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <select value={type} onChange={(e) => setType(e.target.value as "income" | "expense")}>
-            <option value="income" >รายรับ</option>
-            <option value="expense" >รายจ่าย</option>
-          </select>
+  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 flex items-center justify-center p-4">
+    {/* กล่อง Modal */}
+    <div className="bg-slate-900 border border-slate-700 p-6 rounded-xl shadow-2xl w-full max-w-md relative">
+      {/* ปุ่มปิด */}
+      <button
+        className="absolute right-3 top-3 text-gray-400 hover:text-red-400 transition"
+        onClick={onClose}
+      >
+        ✕
+      </button>
 
-          <select value={category || ''} onChange={(e) => {
-            if (e.target.value === 'add'){
-              window.location.href = '/admin/category'
-              return;
-            } else {
-              setCategory(parseInt(e.target.value));
-            }
-          }}>
-            {categories.map(c => (
-                <option key={c.category_id} value={c.category_id}>{c.name}</option>
-            ))}
-              <option value="add">เพิ่ม</option>
+      {/* หัวข้อ */}
+      <h2 className="text-lg font-semibold text-emerald-400 mb-5">
+         เพิ่ม/แก้ไข รายการธุรกรรม
+      </h2>
+
+      {/* ฟอร์ม */}
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+        {/* ประเภท */}
+        <div>
+          <label className="block text-sm text-gray-300 mb-1">ประเภท</label>
+          <select
+            value={type}
+            onChange={(e) => setType(e.target.value as "income" | "expense")}
+            className="w-full bg-slate-800 border border-slate-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+          >
+            <option value="income">รายรับ</option>
+            <option value="expense">รายจ่าย</option>
           </select>
-    
+        </div>
+
+        {/* หมวดหมู่ */}
+        <div>
+          <label className="block text-sm text-gray-300 mb-1">หมวดหมู่</label>
+          <select
+            value={category || ""}
+            onChange={(e) => {
+              if (e.target.value === "add") {
+                window.location.href = "/admin/category";
+              } else {
+                setCategory(parseInt(e.target.value));
+              }
+            }}
+            className="w-full bg-slate-800 border border-slate-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+          >
+            {categories.map((c) => (
+              <option key={c.category_id} value={c.category_id}>
+                {c.name}
+              </option>
+            ))}
+            <option value="add">+ เพิ่มหมวดหมู่ใหม่</option>
+          </select>
+        </div>
+
+        {/* จำนวนเงิน */}
+        <div>
+          <label className="block text-sm text-gray-300 mb-1">จำนวนเงิน</label>
           <input
             type="number"
             value={amount}
-            placeholder="จำนวนเงิน"
+            placeholder="จำนวนเงิน (บาท)"
             onChange={(e) => setAmount(e.target.value)}
             required
+            className="w-full bg-slate-800 border border-slate-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
           />
+        </div>
 
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-          />
+        {/* วันที่ + เวลา */}
+        <div className="flex gap-2">
+          <div className="flex-1">
+            <label className="block text-sm text-gray-300 mb-1">วันที่</label>
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-full bg-slate-800 border border-slate-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+            />
+          </div>
+          <div className="flex-1">
+            <label className="block text-sm text-gray-300 mb-1">เวลา</label>
+            <input
+              type="time"
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
+              className="w-full bg-slate-800 border border-slate-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+            />
+          </div>
+        </div>
 
+        {/* รายละเอียด */}
+        <div>
+          <label className="block text-sm text-gray-300 mb-1">รายละเอียด</label>
           <input
-            type="time"
-            value={time}
-            onChange={(e) => setTime(e.target.value)}
-          />
-
-          <input
-            placeholder="รายละเอียด"
+            placeholder="เช่น ค่ากาแฟ, รายรับจากงานพิเศษ"
             type="text"
             value={note}
             onChange={(e) => setNote(e.target.value)}
+            className="w-full bg-slate-800 border border-slate-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
           />
-          
+        </div>
+
+        {/* แนบไฟล์ */}
+        <div>
+          <label className="block text-sm text-gray-300 mb-1">แนบไฟล์ (ถ้ามี)</label>
           <input
             ref={fileInputRef}
             type="file"
-            onChange={(e) => setAttachment(e.target.files ? e.target.files[0] : null)}
-            className="file:mr-4 file:rounded-full file:border-0 file:bg-violet-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-violet-700 hover:file:bg-violet-100 dark:file:bg-violet-600 dark:file:text-violet-100 dark:hover:file:bg-violet-500"
+            onChange={(e) =>
+              setAttachment(e.target.files ? e.target.files[0] : null)
+            }
+            className="w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-emerald-600 file:px-3 file:py-2 file:text-white hover:file:bg-emerald-500 cursor-pointer"
           />
-          <div className="flex justify-end items-center">
-            <button
-              type="button"
-              className="mr-2 px-4 py-2 rounded bg-red-500 hover:bg-gray-400"
-              onClick={onClose}
-            >
-              Cancel
-            </button>
-            <button type="submit" disabled={loading} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-              {loading ? "Submitting..." : "Submit"}
-            </button>
-            
-          </div>
-        </form>
-      </div>
+        </div>
+
+        {/* ปุ่ม */}
+        <div className="flex justify-end items-center gap-2 mt-4">
+          <button
+            type="button"
+            className="px-4 py-2 rounded-md bg-slate-700 hover:bg-slate-600 text-gray-200 transition"
+            onClick={onClose}
+          >
+            ❌ ยกเลิก
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-5 py-2 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition"
+          >
+            {loading ? "กำลังบันทึก..." : "บันทึก"}
+          </button>
+        </div>
+      </form>
     </div>
-    );
+  </div>
+);
+
 };
 
 export default AddTransactionForm2;
