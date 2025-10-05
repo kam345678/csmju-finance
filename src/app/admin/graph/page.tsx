@@ -15,7 +15,6 @@ export default function GraphPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filter, setFilter] = useState<"all" | "month" | "year">("all");
 
-
   const fetchData = useCallback(async () => {
     let query = supabase
       .from("transactions")
@@ -34,20 +33,19 @@ export default function GraphPage() {
     if (!error && data) setTransactions(data);
   }, [filter]);
 
-
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   return (
-    <div className="p-4 sm:p-6 min-h-screen bg-slate-900 text-white space-y-8">
-      {/* Header */}
+    <div className="p-5 sm:p-8 min-h-screen bg-gradient-to-tr from-[#07121C] via-[#0B1F2D] to-[#123445] text-white space-y-8">
+      {/* ✅ Header */}
       <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
-        <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-wide">
-           สรุปรายงานกราฟทางการเงิน
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-wide text-white">
+          📊 สรุปรายงานกราฟทางการเงิน
         </h1>
 
-        {/* Filter buttons */}
+        {/* ✅ Filter Buttons */}
         <div className="flex flex-wrap gap-2">
           {[
             { label: "ทั้งหมด", key: "all" as const },
@@ -57,10 +55,10 @@ export default function GraphPage() {
             <button
               key={btn.key}
               onClick={() => setFilter(btn.key)}
-              className={`px-4 py-2 rounded-lg font-medium transition-all shadow-md text-sm sm:text-base ${
+              className={`px-4 py-2 rounded-lg font-medium transition-all shadow-md text-sm sm:text-base border border-white/30 ${
                 filter === btn.key
-                  ? "bg-blue-600 text-white"
-                  : "bg-slate-700 hover:bg-slate-600 text-slate-300"
+                  ? "bg-gradient-to-r from-[#0D3C5D] to-[#10577A] text-white shadow-lg hover:from-[#10577A] hover:to-[#0D3C5D]"
+                  : "bg-white/10 text-white/80 hover:bg-white/20"
               }`}
             >
               {btn.label}
@@ -69,12 +67,12 @@ export default function GraphPage() {
         </div>
       </div>
 
-      {/* Summary Cards */}
-      <div className="bg-slate-800/80 p-5 rounded-2xl border border-slate-700 shadow-lg overflow-x-auto">
+      {/* ✅ Summary Cards */}
+      <div className="bg-white/10 p-5 rounded-2xl border border-white/20 shadow-xl backdrop-blur-md">
         <SummaryCards transactions={transactions} />
       </div>
 
-      {/* Charts */}
+      {/* ✅ Charts Section */}
       <section className="space-y-10">
         {/* Donut Charts */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -82,9 +80,9 @@ export default function GraphPage() {
             (Chart, i) => (
               <div
                 key={i}
-                className="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-md hover:shadow-blue-900/40 transition-all flex justify-center items-center overflow-x-auto"
+                className="bg-white/10 p-4 rounded-xl border border-white/20 shadow-lg hover:shadow-[#10577A]/40 transition-all flex justify-center items-center backdrop-blur-md"
               >
-                <div className="min-w-[280px] sm:min-w-[300px] md:min-w-[350px] max-w-full flex justify-center items-center">
+                <div className="min-w-[280px] sm:min-w-[320px] md:min-w-[360px] flex justify-center items-center">
                   <Chart transactions={transactions} />
                 </div>
               </div>
@@ -97,9 +95,9 @@ export default function GraphPage() {
           {[IncomeExpenseBar, ExpenseByCategoryBar].map((Chart, i) => (
             <div
               key={i}
-              className="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-md hover:shadow-blue-900/40 transition-all flex justify-center items-center overflow-x-auto"
+              className="bg-white/10 p-4 rounded-xl border border-white/20 shadow-lg hover:shadow-[#10577A]/40 transition-all flex justify-center items-center backdrop-blur-md"
             >
-              <div className="min-w-[300px] sm:min-w-[340px] md:min-w-[400px] max-w-full flex justify-center items-center">
+              <div className="min-w-[300px] sm:min-w-[340px] md:min-w-[400px] flex justify-center items-center">
                 <Chart transactions={transactions} />
               </div>
             </div>
@@ -111,9 +109,9 @@ export default function GraphPage() {
           {[IncomeExpenseLine, LineByCategoryChart].map((Chart, i) => (
             <div
               key={i}
-              className="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-md hover:shadow-blue-900/40 transition-all flex justify-center items-center overflow-x-auto"
+              className="bg-white/10 p-4 rounded-xl border border-white/20 shadow-lg hover:shadow-[#10577A]/40 transition-all flex justify-center items-center backdrop-blur-md"
             >
-              <div className="min-w-[300px] sm:min-w-[340px] md:min-w-[400px] max-w-full flex justify-center items-center">
+              <div className="min-w-[300px] sm:min-w-[340px] md:min-w-[400px] flex justify-center items-center">
                 <Chart transactions={transactions} />
               </div>
             </div>

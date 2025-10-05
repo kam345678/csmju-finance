@@ -1,5 +1,5 @@
-
 "use client";
+
 import { LogoutButton } from "@/components/logout_buton";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
@@ -20,8 +20,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, []);
 
   return (
-    <div className="flex h-screen bg-slate-900 text-white">
-      {/* 🔹 Mobile Overlay เมื่อ Sidebar เปิด */}
+    <div className="flex h-screen bg-gradient-to-br from-[#07121C] via-[#0B1F2D] to-[#123445] text-white font-inter">
+      
+      {/* Mobile overlay */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
@@ -29,35 +30,32 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         ></div>
       )}
 
-      {/* 🔹 ส่วนหลัก */}
       <div className="flex-1 flex flex-col">
-        {/* 🔸 Navbar */}
-        <nav className="border-b border-slate-700 shadow-md w-full sticky top-0 z-50 bg-slate-950/95 backdrop-blur-sm">
+        {/* Navbar */}
+        <nav className="sticky top-0 z-50 w-full bg-[#0D2A3C]/90 backdrop-blur-md shadow-lg border-b border-[#123445]/40">
           <div className="px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between h-16 items-center">
               
-              {/* ปุ่มเปิด Sidebar สำหรับมือถือ */}
+              {/* Mobile toggle */}
               <button
-                className="md:hidden p-2 rounded-lg hover:bg-slate-800 transition"
+                className="md:hidden p-2 rounded-lg hover:bg-[#123445]/40 transition"
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               >
                 <Menu size={24} />
               </button>
 
-              {/* โลโก้ */}
-              <div className="flex items-center gap-3">
-                <Link href="/" className="flex items-center gap-2">
-                  <Image
-                    src="/csfinanceLogo.png"
-                    alt="Logo"
-                    width={140}
-                    height={100}
-                    className="drop-shadow-lg"
-                  />
-                </Link>
-              </div>
+              {/* Logo */}
+              <Link href="/" className="flex items-center gap-2">
+                <Image
+                  src="/csfinanceLogo.png"
+                  alt="Logo"
+                  width={140}
+                  height={100}
+                  className="drop-shadow-2xl"
+                />
+              </Link>
 
-              {/* ส่วนขวา: email + logout */}
+              {/* Email + logout */}
               <div className="flex items-center gap-3">
                 {email && (
                   <span className="hidden sm:inline text-gray-300 text-sm">
@@ -70,18 +68,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </nav>
 
-        {/* 🔸 โครงหลักของ Dashboard */}
+        {/* Main section */}
         <div className="flex flex-1 overflow-hidden">
-          {/* 🔹 Sidebar */}
+          {/* ✅ Sidebar (เปลี่ยนให้เหมือนหน้า graph) */}
           <div
-            className={`fixed md:static top-16 bottom-0 left-0 w-64 bg-slate-950 border-r border-slate-800 p-4 transform transition-transform duration-300 ease-in-out z-50
-            ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
+            className={`fixed md:static top-16 bottom-0 left-0 w-72 
+            bg-gradient-to-b from-[#0B1F2D] via-[#123445] to-[#1B3A4B] 
+            border-r border-[#123445]/40 p-4 transform transition-transform duration-300 ease-in-out z-50
+            ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 
+            rounded-r-xl shadow-2xl`}
           >
             <Sidebar />
           </div>
 
-          {/* 🔹 Main content */}
-          <main className="flex-1 overflow-y-auto p-6 bg-slate-900/80 backdrop-blur-sm">
+          {/* Content */}
+          <main className="flex-1 overflow-y-auto p-6 bg-[#0B1F2D]/70 backdrop-blur-sm">
             {children}
           </main>
         </div>

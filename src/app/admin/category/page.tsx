@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { Categories } from "@/types/index";
 import AddCategoryForm from "@/components/AddCategoryForm";
+import { Trash2 } from "lucide-react";
 
 export default function CategoryPage() {
   const [categories, setCategories] = useState<Categories[]>([]);
@@ -22,45 +23,50 @@ export default function CategoryPage() {
   }, []);
 
   return (
-    <div className="p-6 min-h-screen bg-slate-900 text-white">
+    <div className="min-h-screen bg-gradient-to-tr from-[#07121C] via-[#0B1F2D] to-[#123445] text-white font-sans p-6">
+      
+      {/* Back button */}
       <button
         onClick={() => router.push("/admin/dashboard")}
-        className="mb-6 px-5 py-2.5 bg-blue-600 rounded-lg hover:bg-blue-700 transition-all shadow-lg font-medium"
+        className="mb-6 px-5 py-2.5 font-medium rounded-xl border border-white/30 text-white bg-gradient-to-r from-[#0D3C5D] to-[#10577A] shadow-md hover:from-[#10577A] hover:to-[#0D3C5D] hover:scale-105 transition-transform duration-300 flex items-center gap-2"
       >
         ← กลับไปหน้าแดชบอร์ด
       </button>
 
       <h1 className="text-3xl font-bold mb-6 text-white tracking-wide">
-         จัดการหมวดหมู่
+        🗂️ จัดการหมวดหมู่
       </h1>
 
-      {/* กล่องฟอร์มเพิ่มหมวดหมู่ */}
-      <div className="bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-700">
+      {/* Add Category Form */}
+      <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20 shadow-xl mb-8">
         <AddCategoryForm onAdded={fetchCategories} />
       </div>
 
-      {/* ตารางหมวดหมู่ */}
-      <div className="mt-8">
-        {categories.length === 0 ? (
-          <p className="text-slate-400 text-center mt-10">
-            ยังไม่มีหมวดหมู่ในระบบ
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
-            {categories.map((cat) => (
-              <div
-                key={cat.category_id}
-                className="p-4 bg-slate-800 rounded-xl border border-slate-700 shadow-md hover:shadow-blue-900/40 hover:-translate-y-1 transition-transform"
-              >
-                <span className="text-lg font-semibold text-blue-400 block mb-1">
-                  {cat.name}
-                </span>
-                <span className="text-sm text-slate-400">รหัส: {cat.category_id}</span>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      {/* Categories Grid */}
+      {categories.length === 0 ? (
+        <p className="text-white/70 text-center mt-10 text-lg animate-pulse">
+          ไม่มีหมวดหมู่ในระบบ
+        </p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+          {categories.map((cat) => (
+            <div
+              key={cat.category_id}
+              className="p-5 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-lg hover:shadow-[#0D6EAA]/40 hover:-translate-y-1 transition-all flex flex-col justify-between"
+            >
+              <span className="text-lg font-semibold text-[#0D6EAA] mb-2 flex items-center gap-2">
+                📂 {cat.name}
+              </span>
+              <span className="text-sm text-white/70 mb-3">รหัส: {cat.category_id}</span>
+
+              {/* Delete Button */}
+              <button className="self-start px-3 py-1 bg-gradient-to-r from-red-700 to-red-500 hover:from-red-600 hover:to-red-400 shadow-md rounded-lg text-sm flex items-center gap-1 transition-all">
+                <Trash2 size={16} /> ลบ
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
