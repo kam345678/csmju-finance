@@ -62,6 +62,7 @@ export async function register(formData: FormData): Promise<void> {
   } else {
     // Upload file first if exists
     let attachment_URL = "";
+
     if (file && file.size > 0) {
       if (file.size > 20 * 1024 * 1024) throw new Error("File too large, max 20 MB");
       const fileExt = file.name.split(".").pop();
