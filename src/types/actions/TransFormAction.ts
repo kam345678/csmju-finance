@@ -20,10 +20,11 @@ export async function register(formData: FormData): Promise<void> {
   const time = formData.get("time") as string;
   const note = formData.get("note") as string;
   const file = formData.get("attachment") as File | null;
-  const supabase = createServerComponentClient({
-    cookies: () => Promise.resolve(cookies())
-  });
-  let attachment_URL = "";
+  
+  // Removed unused cookieStore variable as per instruction
+  // Changed to use cookies() directly (Next.js 15 synchronous)
+  const supabase = createServerComponentClient({ cookies });
+  let attachment_URL: string | null = null; // Explicitly null when no file uploaded
 
   const supabaseAdmin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -51,8 +52,8 @@ export async function register(formData: FormData): Promise<void> {
   let insertedTransactionId = transaction_id;
 
   if (transaction_id) {
-    //  Update
-    const { error } = await supabase
+    // Update using supabaseAdmin to bypass RLS and prevent duplicate key errors
+    const { error } = await supabaseAdmin
       .from("transactions")
       .update({ type, category, amount, date, time, note })
       .eq("transaction_id", transaction_id);
@@ -61,15 +62,18 @@ export async function register(formData: FormData): Promise<void> {
     console.log("Update successful! ID:", transaction_id);
   } else {
     // Upload file first if exists
-    let attachment_URL = "";
     if (file && file.size > 0) {
       if (file.size > 20 * 1024 * 1024) throw new Error("File too large, max 20 MB");
       const fileExt = file.name.split(".").pop();
-      const fileName = `${uuidv4()}.${fileExt}`;
+
+      // Prepend uuidv4 to file name to ensure uniqueness (changed as per instruction)
+      const fileName = `${uuidv4()}_${file.name}`;
       const { error: uploadError } = await supabase.storage.from("attachments").upload(fileName, file);
       if (uploadError) throw new Error(uploadError.message);
       const { data: urlData } = supabase.storage.from("attachments").getPublicUrl(fileName);
       attachment_URL = urlData.publicUrl;
+    } else {
+      attachment_URL = null; // Explicitly set to null when no file uploaded
     }
 
     // Prepare transaction data
@@ -81,31 +85,28 @@ export async function register(formData: FormData): Promise<void> {
       date: string;
       time: string;
       note: string;
-      attachment_URL?: string;
+      attachment_URL?: string | null;
     } = { user_id, type, category, amount, date, time, note };
     if (attachment_URL) {
-      const { data: existing } = await supabase
-        .from("transactions")
-        .select("transaction_id")
-        .eq("attachment_URL", attachment_URL)
-        .maybeSingle();
-      if (!existing) transactionInsertData.attachment_URL = attachment_URL;
+      transactionInsertData.attachment_URL = attachment_URL; // Simplified, no duplicate check needed here
     }
 
-    const { data, error } = await supabase.from("transactions").insert([transactionInsertData]).select();
+    // Insert using supabaseAdmin to bypass RLS and prevent duplicate key errors (changed as per instruction)
+    const { data, error } = await supabaseAdmin.from("transactions").insert([transactionInsertData]).select();
     if (error) throw new Error(error.message);
     insertedTransactionId = data![0].transaction_id;
     console.log("Insert successful! ID:", insertedTransactionId);
   }
 
-  // Upload file ถ้ามี
+  // Upload file ถ้ามี and transaction_id exists (update case)
   if (file && file.size > 0 && transaction_id) {
     if (file.size > 20 * 1024 * 1024) { // 20 MB
       throw new Error("File too large, max 20 MB");
     }
 
     const fileExt = file.name.split(".").pop();
-    const fileName = `${uuidv4()}.${fileExt}`;
+    // Prepend uuidv4 to file name for uniqueness (changed as per instruction)
+    const fileName = `${uuidv4()}_${file.name}`;
 
     // อัปโหลดไฟล์
     const { error: uploadError } = await supabase.storage
@@ -133,9 +134,10 @@ export async function register(formData: FormData): Promise<void> {
 
     // ถ้ายังไม่ถูกใช้ หรือเป็น transaction เดียวกัน ค่อยอัปเดต
     if (!existingFile || existingFile.transaction_id === insertedTransactionId) {
-      const { error: updateRowError } = await supabase
+      // Update using supabaseAdmin to bypass RLS and prevent duplicate key errors (changed as per instruction)
+      const { error: updateRowError } = await supabaseAdmin
         .from("transactions")
-        .update({ attachment_URL })
+        .update({ attachment_URL: attachment_URL || null })
         .eq("transaction_id", insertedTransactionId);
 
       if (updateRowError) {

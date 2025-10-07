@@ -24,12 +24,10 @@ export default function AuthPage() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
-        const email = session.user.email;
+        //  เมื่อ Login สำเร็จ → redirect ได้เลย
+        const email = session.user.email;   //src/app/auth/login/page.tsx
 
-        if (
-          email === "tk.kam23132@gmail.com" ||
-          email === "khumpeechaiaranon@gmail.com"
-        ) {
+        if (email === "tk.kam23132@gmail.com" || email === "youremail@example.com") {  
           router.push("/admin/dashboard");
         } else {
           router.push("/user/dashboard");

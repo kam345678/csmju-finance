@@ -34,7 +34,7 @@ export default function Sidebar() {
   }, []);
 
   return (
-    <aside className="w-64 h-full text-white flex flex-col p-4 ">
+    <aside className=" w-64 h-full text-white flex flex-col p-4 ">
       <div className="mb-8 font-bold text-lg justify-between"></div>
       <nav className="flex-1 flex flex-col gap-2">
         {MENU_ITEMS.map((item) => {

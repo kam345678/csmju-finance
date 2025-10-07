@@ -30,6 +30,7 @@ const AddTransactionForm2: React.FC<AddTransactionFormProps> = ({  show, onClose
 
   const [note, setNote] = useState<string>("");
   const [attachment, setAttachment] = useState<File | null>(null);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
 

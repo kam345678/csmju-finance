@@ -6,6 +6,8 @@ import Link from "next/link";
 import Sidebar from "@/components/tutorial/Sidebar";
 import { Menu } from "lucide-react";
 import Image from "next/image";
+import Footer from "@/components/Footer";
+
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [email, setEmail] = useState<string | null>(null);
@@ -52,15 +54,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   className="drop-shadow-lg"
                 />
               </Link>
-
-              {/* Email + Logout */}
-              <div className="flex items-center gap-3">
-                {email && (
-                  <span className="hidden sm:inline text-white/70 text-sm">
-                    {email}
-                  </span>
-                )}
-                <LogoutButton />
+              <div className="flex items-center gap-6">
+                <Link href="/admin/Docs" className="hidden sm:inline-block">
+                  Docs
+                </Link>
+                {/* Email + Logout */}
+                <div className="flex items-center gap-3">
+                  {email && (
+                    <span className="hidden sm:inline text-white/70 text-sm">
+                      {email}
+                    </span>
+                  )}
+                  <LogoutButton />
+                </div>
               </div>
             </div>
           </div>
@@ -79,7 +85,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
           <main className="flex-1 overflow-y-auto p-6 bg-white/5 backdrop-blur-sm border-l border-white/10">
             {children}
+            <Footer />
           </main>
+          
         </div>
       </div>
     </div>

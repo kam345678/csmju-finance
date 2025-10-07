@@ -3,12 +3,10 @@ import { LogoutButton } from "@/components/logout_buton";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import Link from "next/link";
-import Sidebar from "@/components/tutorial/Sidebar";
 import { Menu } from "lucide-react";
 import Image from "next/image";
-import Footer from "@/components/Footer";
 
-export default function GraphLayout({ children }: { children: React.ReactNode }) {
+export default function DocsLayout({ children }: { children: React.ReactNode }) {
   const [email, setEmail] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -43,7 +41,7 @@ export default function GraphLayout({ children }: { children: React.ReactNode })
               </button>
 
               {/* Logo */}
-              <Link href="/" className="flex items-center gap-2">
+              <Link href="/admin/dashboard" className="flex items-center gap-2">
                 <Image
                   src="/csfinanceLogo.png"
                   alt="CS Finance Logo"
@@ -53,15 +51,19 @@ export default function GraphLayout({ children }: { children: React.ReactNode })
                   className="drop-shadow-lg"
                 />
               </Link>
-
-              {/* Email + Logout */}
-              <div className="flex items-center gap-3">
-                {email && (
-                  <span className="hidden sm:inline text-white/70 text-sm">
-                    {email}
-                  </span>
-                )}
-                <LogoutButton />
+              <div className="flex items-center gap-6">
+                <Link href="admin/Docs" className="hidden sm:inline-block">
+                  Docs
+                </Link>
+                {/* Email + Logout */}
+                <div className="flex items-center gap-3">
+                  {email && (
+                    <span className="hidden sm:inline text-white/70 text-sm">
+                      {email}
+                    </span>
+                  )}
+                  <LogoutButton />
+                </div>
               </div>
             </div>
           </div>
@@ -69,18 +71,8 @@ export default function GraphLayout({ children }: { children: React.ReactNode })
 
         {/* Main Content */}
         <div className="flex flex-1 overflow-hidden">
-          <div
-            className={`fixed md:static top-16 bottom-0 left-0 w-72 
-            bg-gradient-to-b from-[#0B1F2D] via-[#123445] to-[#1B3A4B] 
-            border-r border-[#123445]/40 p-4 transform transition-transform duration-300 ease-in-out z-50
-            ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 
-             shadow-xl`}
-          >
-            <Sidebar />
-          </div>
-          <main className="flex-1 overflow-y-auto p-6 bg-white/5 backdrop-blur-sm border-l border-white/10">
+          <main className="flex-1 overflow-y-auto p-6 bg-zinc-900 backdrop-blur-sm border-l border-white/10">
             {children}
-            <Footer />
           </main>
         </div>
       </div>
