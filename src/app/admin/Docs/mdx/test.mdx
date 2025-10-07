@@ -1,0 +1,13 @@
+
+```bash
+  import React, { useEffect, useState, useCallback,useRef } from "react";
+
+    - ใช้  useState สร้างและจัดการ state (ค่าที่เปลี่ยนได้) ภายใน component 
+
+    - ใช้ useEffect ใช้สำหรับจัดการ side effects เช่น เรียก API subscribe/realtime updates ดึงข้อมูลบน supabse api มาแสดงผล 
+
+    - ใช้  useCallback ใช้สำหรับ จำค่า function ไว้ ป้องกันการสร้าง function ใหม่ทุกครั้งที่ component re-render
+
+      React จะสร้าง  fetchTransactions แค่ครั้งเดียว (เพราะ [] ว่าง) ไม่ต้องสร้างใหม่ทุกครั้งที่หน้า re-render
+
+    - useRef  ใช้เพื่อ เก็บค่าที่สามารถ “คงอยู่ระหว่างการ re-render” ได้โดยไม่ทำให้ component re-render ใหม่

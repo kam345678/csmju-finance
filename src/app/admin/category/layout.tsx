@@ -6,6 +6,7 @@ import Link from "next/link";
 import Sidebar from "@/components/tutorial/Sidebar";
 import { Menu } from "lucide-react";
 import Image from "next/image";
+import Footer from "@/components/Footer";
 
 export default function CategoryLayout({ children }: { children: React.ReactNode }) {
   const [email, setEmail] = useState<string | null>(null);
@@ -81,6 +82,7 @@ export default function CategoryLayout({ children }: { children: React.ReactNode
           </div>
           <main className="flex-1 overflow-y-auto p-6 bg-white/5 backdrop-blur-sm border-l border-white/10">
             {children}
+            <Footer />
           </main>
         </div>
       </div>

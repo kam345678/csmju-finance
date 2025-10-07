@@ -1,0 +1,16 @@
+```bash
+import nodemailer from "nodemailer";
+
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",     // เซิร์ฟเวอร์ SMTP
+  port: 465,                  // พอร์ตของ SMTP
+  secure: true,               // ใช้ SSL
+  auth: {
+    user: "your-email@gmail.com",  // อีเมลผู้ส่ง
+    pass: "your-app-password",     // รหัสผ่านแอป (ไม่ใช่รหัสจริง)
+  },
+});
+
+-เป็นการ import ไลบรารี nodemailer เข้ามาใช้ในโค้ด เพื่อให้ ส่งอีเมลจากฝั่ง server ได้ด้วย Node.js
+- SMTP (Simple Mail Transfer Protocol) คือ โปรโตคอลมาตรฐานสำหรับส่งอีเมล
+    nodemailer จะเชื่อมต่อกับ SMTP server ของผู้ให้บริการ
