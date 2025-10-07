@@ -8,16 +8,16 @@ import Nodemailer from './mdx/nodemailer.mdx'
 import type { ReactNode, ComponentType } from 'react'
 
 type MDXComponentsType = {
-  [key: string]: ComponentType<any>
+  [key: string]: ComponentType<{ className?: string; children?: ReactNode }>
 }
 
 const mdxComponents: MDXComponentsType = {
-  code: ({ className, children }: { className?: string; children: ReactNode }) => {
+  code: ({ className, children }: { className?: string; children?: ReactNode }) => {
     const match = /language-(\w+)/.exec(className || '')
     return (
       <ClientSyntaxHighlighter
         language={match ? match[1] : 'text'}
-        code={String(children).trim()}
+        code={String(children || '').trim()}
       />
     )
   },
@@ -39,4 +39,3 @@ export default function DocsClient() {
     </div>
   )
 }
-
