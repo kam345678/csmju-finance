@@ -5,6 +5,9 @@ import { cookies } from "next/headers";
 import nodemailer from "nodemailer";
 import { createClient } from "@supabase/supabase-js";
 
+function sanitizeFileName(fileName: string): string {
+  return fileName.replace(/[^a-zA-Z0-9.-]/g, "_");
+}
 
 export async function register(formData: FormData): Promise<void> {
   const transaction_id = formData.get("transaction_id") as string | null;
@@ -64,10 +67,11 @@ export async function register(formData: FormData): Promise<void> {
     // Upload file first if exists
     if (file && file.size > 0) {
       if (file.size > 20 * 1024 * 1024) throw new Error("File too large, max 20 MB");
-      const fileExt = file.name.split(".").pop();
+      // const fileExt = file.name.split(".").pop();
 
       // Prepend uuidv4 to file name to ensure uniqueness (changed as per instruction)
-      const fileName = `${uuidv4()}_${file.name}`;
+      const safeFileName = sanitizeFileName(file.name);
+      const fileName = `${uuidv4()}_${safeFileName}`;
       const { error: uploadError } = await supabase.storage.from("attachments").upload(fileName, file);
       if (uploadError) throw new Error(uploadError.message);
       const { data: urlData } = supabase.storage.from("attachments").getPublicUrl(fileName);
@@ -85,11 +89,24 @@ export async function register(formData: FormData): Promise<void> {
       date: string;
       time: string;
       note: string;
-      attachment_URL?: string | null;
+      attachment_URL?: string;
     } = { user_id, type, category, amount, date, time, note };
-    if (attachment_URL) {
-      transactionInsertData.attachment_URL = attachment_URL; // Simplified, no duplicate check needed here
+    // เพิ่มเฉพาะเมื่อมีไฟล์จริงเท่านั้น
+    if (attachment_URL && attachment_URL !== "null" && attachment_URL !== "undefined") {
+      const { data: existingFile } = await supabase
+        .from("transactions")
+        .select("transaction_id")
+        .eq("attachment_URL", attachment_URL)
+        .maybeSingle();
+
+      if (existingFile) {
+        console.warn("Attachment URL already exists, skipping attachment_URL to avoid duplicate:", attachment_URL);
+      } else {
+        transactionInsertData.attachment_URL = attachment_URL;
+      }
     }
+
+    console.log("attachment_URL before insert:", attachment_URL);
 
     // Insert using supabaseAdmin to bypass RLS and prevent duplicate key errors (changed as per instruction)
     const { data, error } = await supabaseAdmin.from("transactions").insert([transactionInsertData]).select();
@@ -104,9 +121,10 @@ export async function register(formData: FormData): Promise<void> {
       throw new Error("File too large, max 20 MB");
     }
 
-    const fileExt = file.name.split(".").pop();
+    // const fileExt = file.name.split(".").pop();
     // Prepend uuidv4 to file name for uniqueness (changed as per instruction)
-    const fileName = `${uuidv4()}_${file.name}`;
+    const safeFileName = sanitizeFileName(file.name);
+    const fileName = `${uuidv4()}_${safeFileName}`;
 
     // อัปโหลดไฟล์
     const { error: uploadError } = await supabase.storage
