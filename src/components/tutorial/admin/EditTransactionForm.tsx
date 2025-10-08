@@ -81,7 +81,12 @@ const EditTransactionForm: React.FC<EditTransactionFormProps> = ({
       const formData = new FormData();
       formData.append("transaction_id", transaction.transaction_id.toString()); // ส่ง id ไปด้วย
       formData.append("type", type);
-      const validCategory = typeof category === "number" && !isNaN(category) ? category : transaction.category;
+      const validCategory = categories.find(c => c.category_id === category)?.category_id;
+      if (!validCategory) {
+        alert("กรุณาเลือกหมวดหมู่ที่ถูกต้อง");
+        setLoading(false);
+        return;
+      }
       formData.append("category", validCategory.toString());
       formData.append("amount", amount);
       formData.append("date", isoDateTime);
@@ -113,7 +118,7 @@ const EditTransactionForm: React.FC<EditTransactionFormProps> = ({
   if (!show || !transaction) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 w-screen h-screen flex items-center justify-center">
       {/* กล่อง Modal */}
       <div className="bg-slate-900 text-white p-6 rounded-xl shadow-2xl w-full max-w-md border border-slate-700 relative animate-fadeIn">
         {/* ปุ่มปิด */}

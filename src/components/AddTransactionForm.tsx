@@ -78,7 +78,7 @@ const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ onAdded }) => {
 
       // Reset form
       setType("income");
-      setCategory(0);
+      if (categories.length > 0)setCategory(categories[0].category_id);
       setAmount("");
       setDate(now.toISOString().slice(0, 10));
       setTime(formatTime(new Date()));
