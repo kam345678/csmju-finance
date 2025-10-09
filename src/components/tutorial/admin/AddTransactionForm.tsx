@@ -13,7 +13,7 @@ interface AddTransactionFormProps {
 
 const AddTransactionForm2: React.FC<AddTransactionFormProps> = ({  show, onClose,onAdded }) => {
   
-  const formatTime = (date: Date) => {
+  const formatTime = (date: Date) => { //จัดรูปแบบเวลา
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
     return `${hours}:${minutes}`;
@@ -34,7 +34,7 @@ const AddTransactionForm2: React.FC<AddTransactionFormProps> = ({  show, onClose
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
+  useEffect(() => { //ดึงข้อมูลหมวดหมู่ จาก Categories 
     async function fetchCategories() {
       const { data, error } = await supabase.from('Categories').select('category_id, name');
       if (error) {
@@ -93,7 +93,7 @@ const AddTransactionForm2: React.FC<AddTransactionFormProps> = ({  show, onClose
       setNote("");
       setAttachment(null);
       if (fileInputRef.current) {
-      fileInputRef.current.value = ""; // ล้างไฟล์
+      fileInputRef.current.value = ""; // ล้างไฟล์ หลังกดบันทึก
 }
 
       if (onAdded) {

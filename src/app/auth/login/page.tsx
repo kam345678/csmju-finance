@@ -27,7 +27,7 @@ export default function AuthPage() {
         //  เมื่อ Login สำเร็จ → redirect ได้เลย
         const email = session.user.email;   //src/app/auth/login/page.tsx
 
-        if (email === "tk.kam23132@gmail.com" || email === "youremail@example.com") {  
+        if (email === "tk.kam23132@gmail.com" || email === "attawit@mju.ac.th") {  
           router.push("/admin/dashboard");
         } else {
           router.push("/user/dashboard");
