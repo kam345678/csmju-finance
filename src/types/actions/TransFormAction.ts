@@ -54,15 +54,9 @@ export async function register(formData: FormData): Promise<void> {
 
   let insertedTransactionId = transaction_id;      
 
-<<<<<<< HEAD
   if (transaction_id) {
     // Update using supabaseAdmin to bypass RLS and prevent duplicate key errors
     const { error } = await supabaseAdmin
-=======
-  if (transaction_id) {             //ถ้ามี transaction_id -> update รายการนั้น
-    //  Update
-    const { error } = await supabase
->>>>>>> asdfg
       .from("transactions")
       .update({ type, category, amount, date, time, note })
       .eq("transaction_id", transaction_id);
@@ -71,7 +65,6 @@ export async function register(formData: FormData): Promise<void> {
     console.log("Update successful! ID:", transaction_id);
   } else {         //นอกนั้นเพิ่มข้อมูลหรือถ้ายังไม่มีข้อมูลเช่น ถ้ายังไม่มี transaction_id เป็นการ insert นะ 
     // Upload file first if exists
-<<<<<<< HEAD
     if (file && file.size > 0) {
       if (file.size > 20 * 1024 * 1024) throw new Error("File too large, max 20 MB");
       // const fileExt = file.name.split(".").pop();
@@ -85,18 +78,6 @@ export async function register(formData: FormData): Promise<void> {
       attachment_URL = urlData.publicUrl;
     } else {
       attachment_URL = null; // Explicitly set to null when no file uploaded
-=======
-    let attachment_URL = ""; 
-
-    if (file && file.size > 0) {
-      if (file.size > 20 * 1024 * 1024) throw new Error("File too large, max 20 MB");      // กำหนดขนาด ไฟล์
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${uuidv4()}.${fileExt}`;                                                          //แปลงชื่อไฟล์ เป็น URL
-      const { error: uploadError } = await supabase.storage.from("attachments").upload(fileName, file);
-      if (uploadError) throw new Error(uploadError.message);
-      const { data: urlData } = supabase.storage.from("attachments").getPublicUrl(fileName);              
-      attachment_URL = urlData.publicUrl;                                                           //สร้าง public URL
->>>>>>> asdfg
     }
 
     // Prepare transaction data
@@ -125,14 +106,10 @@ export async function register(formData: FormData): Promise<void> {
       }
     }
 
-<<<<<<< HEAD
     console.log("attachment_URL before insert:", attachment_URL);
 
     // Insert using supabaseAdmin to bypass RLS and prevent duplicate key errors (changed as per instruction)
     const { data, error } = await supabaseAdmin.from("transactions").insert([transactionInsertData]).select();
-=======
-    const { data, error } = await supabase.from("transactions").insert([transactionInsertData]).select(); 
->>>>>>> asdfg
     if (error) throw new Error(error.message);
     insertedTransactionId = data![0].transaction_id;
     console.log("Insert successful! ID:", insertedTransactionId);
